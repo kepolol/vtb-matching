@@ -17,4 +17,4 @@ class ContrastiveLoss(nn.Module):
         if raw:
             return losses
         else:
-            return losses.mean()  # if size_average else losses.sum()
+            return losses.mean()

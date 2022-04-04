@@ -42,7 +42,7 @@ class BankModel(nn.Module):
 
     def __init__(self,
                  mcc_classes: int, mcc_emb_size: int,
-                 currency_rk_classes: int, currency_rk_emb_size: int, device: str = 'cpu'):
+                 currency_rk_classes: int, currency_rk_emb_size: int, output_emb_size: int = 128, device: str = 'cpu'):
         super().__init__()
         self.device = device
         self.emb_mcc = EmbeddingModel(num_embeddings=mcc_classes + 1,
@@ -58,7 +58,7 @@ class BankModel(nn.Module):
             nn.PReLU(),
             nn.Linear(256, 256),
             nn.PReLU(),
-            nn.Linear(256, 128)
+            nn.Linear(256, output_emb_size)
         )
 
     def forward(self, x):
@@ -79,7 +79,7 @@ class BankModel(nn.Module):
 class RTKModel(nn.Module):
 
     def __init__(self,
-                 cat_id_classes: int, cat_id_emb_size: int, device: str = 'cpu'):
+                 cat_id_classes: int, cat_id_emb_size: int, output_emb_size: int = 128, device: str = 'cpu'):
         super().__init__()
         self.device = device
         self.emb_cat_id = EmbeddingModel(num_embeddings=cat_id_classes + 1,
@@ -91,7 +91,7 @@ class RTKModel(nn.Module):
             nn.PReLU(),
             nn.Linear(256, 256),
             nn.PReLU(),
-            nn.Linear(256, 128)
+            nn.Linear(256, output_emb_size)
         )
 
     def forward(self, x):
@@ -105,14 +105,17 @@ class CombinedModel(nn.Module):
     def __init__(self,
                  mcc_classes: int, mcc_emb_size: int,
                  currency_rk_classes: int, currency_rk_emb_size: int,
-                 cat_id_classes: int, cat_id_emb_size: int, device: str = 'cpu'):
+                 cat_id_classes: int, cat_id_emb_size: int,
+                 output_emb_size: int = 128, device: str = 'cpu'):
         super().__init__()
         self.m_bank = BankModel(mcc_classes=mcc_classes,
                                 mcc_emb_size=mcc_emb_size,
                                 currency_rk_classes=currency_rk_classes,
-                                currency_rk_emb_size=currency_rk_emb_size, device=device)
+                                currency_rk_emb_size=currency_rk_emb_size,
+                                output_emb_size=output_emb_size, device=device)
         self.m_rtk = RTKModel(cat_id_classes=cat_id_classes,
-                              cat_id_emb_size=cat_id_emb_size, device=device)
+                              cat_id_emb_size=cat_id_emb_size,
+                              output_emb_size=output_emb_size, device=device)
 
     def forward(self, x):
         bank_out = self.m_bank(x)

@@ -36,11 +36,15 @@ def pad_1d(array: Iterable, new_size):
         return array
 
 
-
 class TargetBuilder(object):
-
+    """
+    Класс формирования таргета с парами bank_id, rtk_id для дальнейшего использования.
+    """
     def __init__(self, matching: Union[pd.DataFrame, str], random_state: int = 42) -> NoReturn:
-
+        """
+        :param matching: файл от организаторов с известными парами bank_id-rtk_id.
+        :param random_state:
+        """
         if isinstance(matching, pd.DataFrame):
             self.matching = matching.copy()
         else:
@@ -48,7 +52,11 @@ class TargetBuilder(object):
         self.rnd = check_random_state(random_state)
 
     def get_markup_df(self, target_rate: float = 0.1) -> pd.DataFrame:
-
+        """
+        Функция для создания разметки.
+        :param target_rate: желаемый уровень целевого события.
+        :return: датафрейм с разметкой вида bank_id-rtk_id-target
+        """
         if (target_rate <= 0) or (target_rate >= 1):
             raise ValueError('Relevant target rate range is (0;1)')
         # Знаем, что 1 rtk соответствует 1 bank и наоборот
